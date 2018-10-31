@@ -1,0 +1,16 @@
+// ширина контента . 
+$width :71.25em;
+$transition-time:0.5s;
+
+
+@font-face {
+	font-family:'Intro Book';
+	src:url('../fonts/Intro-Book.otf') format('opentype');
+}
+
+@font-face {
+	font-family:'Helvetica';
+	font-weight:400;
+	font-style:normal;
+	src:url('../fonts/helvetica/HelveticaNeueCyr-Roman.otf') format('opentype');
+}

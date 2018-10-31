@@ -1,0 +1,51 @@
+.sorter-eleemnts-menu, .sortable-blocks {
+  padding: 0.5em;
+  margin: 0 0 1em 0;
+  list-style: none outside none;
+  border: 1px solid black; }
+  .sorter-eleemnts-menu li, .sortable-blocks li {
+    margin: 0.2em 0;
+    background: #aaffaa;
+    padding: 0.5em;
+    color: black; }
+    .sorter-eleemnts-menu li a, .sortable-blocks li a {
+      color: black; }
+    .sorter-eleemnts-menu li.ui-sortable-handle, .sortable-blocks li.ui-sortable-handle {
+      cursor: pointer; }
+    .sorter-eleemnts-menu li.ui-sortable-placeholder, .sortable-blocks li.ui-sortable-placeholder {
+      height: 1.5em;
+      background: #aaaaff;
+      display: block; }
+  .sorter-eleemnts-menu li.level-1, .sortable-blocks li.level-1 {
+    margin-left: 2em; }
+
+.list-files-widget {
+  margin: 0;
+  padding: 0; }
+  .list-files-widget li {
+    display: inline-block;
+    position: relative; }
+    .list-files-widget li img {
+      display: block;
+      margin: 0 auto; }
+    .list-files-widget li .kill {
+      position: absolute;
+      cursor: pointer;
+      background: red;
+      color: black;
+      right: 0;
+      bottom: 0;
+      width: 1em;
+      height: 1em;
+      line-height: 1em;
+      text-align: center;
+      display: none; }
+      .list-files-widget li .kill::before {
+        content: 'X'; }
+    .list-files-widget li:hover .kill {
+      display: block; }
+
+.site-file-manager #wrapper {
+  margin: 0.5em 0; }
+
+/*# sourceMappingURL=admin-site.css.map */
