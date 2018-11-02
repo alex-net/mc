@@ -15,7 +15,7 @@ class m180529_151004_files extends Migration
         $this->createTable('files',[
             'filename'=>$this->string(30)->notnull()->comment('Ключик таблицы'),
             'cid'=>$this->integer()->notnull()->comment('ссылка на контент'),
-            'ct'=>$this->string(10)->notnull()->com_message_pump()nt('Тип контента (он же путь к папке с файлами'),
+            'ct'=>$this->string(10)->notnull()->comment('Тип контента (он же путь к папке с файлами'),
         ]);
         $this->addPrimaryKey('pk','files',['filename']);
     }
