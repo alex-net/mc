@@ -209,6 +209,7 @@ class Content extends \yii\base\Model
 		$list->leftjoin(['m2'=>'menuitems'],'m2.mid=m1.pmid'); // ровень выше .. 
 		$list->leftjoin(['c0'=>'content'],'c0.cid=m2.contentid'); // статья предок ....
 		$list->addSelect(['calias'=>'concat(if(isnull(c0.alias),"",concat(c0.alias,"/")),c.alias)']);// 
+		$list->orderBy(['c.created'=>SORT_DESC]);
 		
 		return $list;
 	}
