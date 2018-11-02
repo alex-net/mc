@@ -19,7 +19,6 @@ $titles=[
 			'label'=>'Заголовок',
 			'attribute'=>'title',
 			'content'=>function($m){
-				\Yii::info($m);
 				return sprintf('%s (%s)',
 					Html::a($m['title'],['admin/content/ct-edit','type'=>$m['type'],'id'=>$m['cid']]),
 					Html::a('перейти','/'.$m['calias'])
