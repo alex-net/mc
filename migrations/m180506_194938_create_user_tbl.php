@@ -19,7 +19,7 @@ class m180506_194938_create_user_tbl extends Migration
             'name'=>$this->string(50)->unique()->notNull()->comment('Имя пользователя, логин'),
             'pass'=>$this->string(60)->notNull()->comment('Пароль юзера'),
             'mail'=>$this->string(60)->notNull()->comment('Ящик пользователя'),
-            'status'=>$this->boolean()->defaultValue(1)->comment('Статус юзера'),
+            'status'=>$this->boolean()->defaultValue(true)->comment('Статус юзера'),
             'created'=>$this->integer()->unsigned()->comment('Дата создания юзеря'),
             'role'=>$this->string(10)->defaultValue('writer')->notNull()->comment('Роль юзера'),
             'token'=>$this->string(60)->notNull()->comment('Токен'),

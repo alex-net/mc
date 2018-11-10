@@ -18,28 +18,39 @@ class m180520_095118_content_tables extends Migration
             'alias'=>$this->string(120)->notNull()->comment('Алиас'),
             'aliasisuser'=>$this->boolean()->comment('Алиас указал юзер'),
             'owner'=>$this->integer()->unsigned()->comment('Кто создал'),
-            'status'=>$this->boolean()->defaultValue(1)->comment('Статус'),
+            'status'=>$this->boolean()->defaultValue(true)->comment('Статус'),
             'body'=>$this->text()->comment('Содержимое'),
             'teaser'=>$this->text()->comment('Содержимое'),
             'created'=>$this->integer()->comment('Создан'),
-            'nomenuitem'=>$this->boolean()->defaultValue(0)->comment('Без пункта меню'),
+            'nomenuitem'=>$this->boolean()->defaultValue(false)->comment('Без пункта меню'),
         ]);
         echo "Таблица контента создана \n";
 
         $this->createTable('files',[
-            'cid'=>$this->integer()->notNull()->unsigned()->comment('Контент с файом'),
-            'filename'=>$this->string(20)->notnull()->comment('Файл'),
+            'filename'=>$this->string(30)->notnull()->comment('Ключик таблицы'),
+            'weight'=>$this->integer(10)->notnull()->defaultValue(0)->comment('Вес файла'),
+            'cid'=>$this->integer()->notnull()->comment('ссылка на контент'),
+            'ct'=>$this->string(10)->notnull()->comment('Тип контента (он же путь к папке с файлами'),
         ]);
-        $this->createIndex('cid','files',['cid']);
+        $this->createIndex('cidpfiles','files',['cid']);
+        try{
+            \yii\helpers\FileHelper::createDirectory(\Yii::getAlias('@files'));
+        }catch(Expression $e){
+
+        }
     }
 
     public function down()
     {
         //echo "m180520_095118_content_tables cannot be reverted.\n";
-        //$this->dropTable('content');
+        //
+        $this->dropTable('content');
+        $this->dropTable('files');
         foreach(\app\models\Content::ContentTypes as $x)
             if (file_exists(\Yii::$aliases['@app'].'/files/'.$x))
                 \yii\helpers\FileHelper::removeDirectory(\Yii::$alisases['@files'].'/'.$x);
+        //_7OwUW3CkG18JMfG
+
         //$this->dropTable('files');
         //return false;
     }

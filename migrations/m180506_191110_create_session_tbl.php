@@ -17,7 +17,7 @@ class m180506_191110_create_session_tbl extends Migration
             'expire'=>$this->integer(),
             'data'=>$this->binary(),
         ]);
-        $this->addPrimaryKey('','sessi',['id']);
+        $this->addPrimaryKey('sesipkey','sessi',['id']);
         echo "Таблица с данными сессий создана \n";
     }
 

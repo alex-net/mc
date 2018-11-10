@@ -15,7 +15,7 @@ class m180521_193656_menu_tbls extends Migration
         $this->createTable('menuitems',[
             'mid'=>$this->primaryKey()->comment('Ключик менюшки'),
             'pmid'=>$this->integer()->unsigned()->defaultValue(0)->comment('Родительский элемент'),
-            'status'=>$this->boolean()->defaultValue(1)->comment('Статус стрницы'),
+            'status'=>$this->boolean()->defaultValue(true)->comment('Статус стрницы'),
             'title'=>$this->string(128)->notNull()->comment('Заголовок пункта меню'),
             'weight'=>$this->integer()->defaultValue(0)->comment('Вес пункта меню'),
             'contentid'=>$this->integer()->unsigned()->comment('ID контента '),
