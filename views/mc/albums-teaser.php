@@ -3,9 +3,9 @@ use yii\helpers\Html;
 $f=explode(',',$model['fn']);
 
 ?>
-<div class="news-item">
+<div class="album-item">
 	<?php if($f[0]):?>
-	<div class='news-image'>
+	<div class='album-image'>
 		<?=Html::a(Html::img(['image/file','preset'=>'albums-preset','fn'=>$f[0]]),'/albums/'.$model['alias'] );?>
 	</div>
 	<?php endif; ?>

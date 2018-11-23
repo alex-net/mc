@@ -176,6 +176,7 @@ html,body {padding:0;margin:0;height:100%;}
 		}
 
 	}
+	// новость 
 	.news-item {
 		&::after {content:'';display:block;clear:both;}
 		.news-image {float:left;margin:0 0.5em 0.5em 0;
@@ -183,6 +184,18 @@ html,body {padding:0;margin:0;height:100%;}
 		}
 		h3 a {text-decoration:none;color:#0097d1;}
 		
+	}
+
+	// альбомы
+	.albums-list {
+		& > div {display: inline-block;width: 30%;box-sizing:border-box;padding:0.5em;vertical-align: top; text-align:conter;}
+		.album-item {
+			.album-image {margin:0 0.5em 0.5em 0;
+				img {display:block;}
+			}
+			h3 a {text-decoration:none;color:#0097d1;}
+			
+		}
 	}
 	ul.pagination {margin:0;padding:0;text-align:center;
 		li {display:inline-block;}

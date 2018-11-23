@@ -3,7 +3,7 @@
 	<h1><?=$model->title; ?></h1>
 	<div class='content'>
 		<?=$model->body;?>
-		<?=\app\widgets\AlbumImageslist::widget(['cid'=>$model->cid,'preset'=>'albums-images']);?>
+		<?=\app\widgets\AlbumImageslist::widget(['cid'=>$model->cid,'preset'=>'albums-preset']);?>
 		
 
 	</div>

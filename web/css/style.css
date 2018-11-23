@@ -352,6 +352,20 @@ html, body {
   .content-tail .news-item h3 a {
     text-decoration: none;
     color: #0097d1; }
+  .content-tail .albums-list > div {
+    display: inline-block;
+    width: 30%;
+    box-sizing: border-box;
+    padding: 0.5em;
+    vertical-align: top;
+    text-align: conter; }
+  .content-tail .albums-list .album-item .album-image {
+    margin: 0 0.5em 0.5em 0; }
+    .content-tail .albums-list .album-item .album-image img {
+      display: block; }
+  .content-tail .albums-list .album-item h3 a {
+    text-decoration: none;
+    color: #0097d1; }
   .content-tail ul.pagination {
     margin: 0;
     padding: 0;

@@ -9,4 +9,7 @@ use yii\widgets\ListView;
 	'dataProvider'=>$list,
 	'itemView'=>'albums-teaser',
 	'summary'=>'',
+	'options'=>[
+		'class'=>'albums-list',
+	],
 ]);
