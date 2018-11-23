@@ -61,8 +61,18 @@ class MenusController extends \yii\web\Controller
 		
 		if (Yii::$app->request->isPost){
 			$post=Yii::$app->request->post();
-			if (isset($post['save']) && $m->saveitem($post) || isset($post['kill']) && $m->killitem($post))
+			$ret=false;
+			switch(true){
+				case isset($post['save']):
+					$ret=$m->saveitem($post);
+				break;
+				case isset($post['kill']):
+					$ret=$m->killitem($post);
+				break;
+			}
+			if ($ret)
 				return $this->redirect(['admin/menus']);
+				
 		}
 		
 		$m->scenario=Menu::SCENARIO_CREATE_FROM_MENU;

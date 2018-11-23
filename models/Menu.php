@@ -9,7 +9,7 @@ class Menu extends \yii\base\Model
 {
 	public $mid;// Ключик менюшки
     public $pmid;//Родительский элемент
-    public $status;// Статус стрницы 
+    public $status=true;// Статус стрницы 
     public $title;// Заголовок пункта меню'
 	public $weight; // Вес пункта меню
 	public $contentid; // ссылка на еонтент ...
@@ -31,7 +31,9 @@ class Menu extends \yii\base\Model
 		$this->status=1;
 		$this->weight=0;*/
 		// достать деток .. 
-		$q=(new Query())->select('mid')->from('menuitems')->where(['pmid'=>$this->mid])->column();
+		$q=[];
+		if (!empty($this->mid))
+			$q=(new Query())->select('mid')->from('menuitems')->where(['pmid'=>$this->mid])->column();
 		$this->_children=$q?$q:[];
 
 	}
@@ -39,7 +41,9 @@ class Menu extends \yii\base\Model
 	public function scenarios()
 	{
 		$s=parent::scenarios();
+		// созание и редактирование меню из формы контента
 		$s[static::SCENARIO_CREATE_FROM_CONTENT]=['mid','title','pmid'];
+		// форма меню .. отдельная 
 		$s[static::SCENARIO_CREATE_FROM_MENU]=['mid','title','status','url','contentid'];
 		$s[static::SCENARIO_KILL_PUNKT]=['mid'];
 		return $s;
@@ -65,27 +69,28 @@ class Menu extends \yii\base\Model
 		return [
 			//['title','required','when'=>function($m){!empty($m->mid);}],
 			['title','required','on'=>static::SCENARIO_CREATE_FROM_MENU],
-			['title','yii\validators\StringValidator','max'=>128],
-			['pmid','yii\validators\NumberValidator','min'=>0,
+			['title','string','max'=>128],
+			['pmid','integer','min'=>0,
 				'when'=>function($m){return $m->pmid!='root';},
 				'whenClient'=>'function(a,v){return v!=="root";}',
 			], // $m->pmid!='root';
-			['mid','yii\validators\NumberValidator','min'=>0],
+			['mid','integer','min'=>0],
 			//['mid','yii\validators\DefaultValueValidator','value'=>0],
-			['contentid','yii\validators\NumberValidator','min'=>0,'on'=>static::SCENARIO_CREATE_FROM_MENU],
-			['url','yii\validators\StringValidator','max'=>128,'on'=>static::SCENARIO_CREATE_FROM_MENU],
+			['contentid','integer','min'=>0,'on'=>static::SCENARIO_CREATE_FROM_MENU],
+			['url','string','max'=>128,'on'=>static::SCENARIO_CREATE_FROM_MENU],
 			['url','required','on'=>static::SCENARIO_CREATE_FROM_MENU,
 				'when'=>function($m){return empty($m->contentid);},
 				'whenClient'=>'function(a,v){return false;}',
 			],
-			['status','yii\validators\BooleanValidator','on'=>static::SCENARIO_CREATE_FROM_MENU],
+			['status','boolean','on'=>static::SCENARIO_CREATE_FROM_MENU],
 		];
 	}
-
+	/**
+	 * генерация списка меню пункты/подпункты 
+	 * */
 	public function generatemMenuOptions()
 	{
 		$mlist=['root'=>'Корень'];
-		Yii::info([$this->mid,$this->children],'mid ch');
 		if (!$this->children){
 			// собрать все пункты которые находятся на первом уровне.. 
 			$q=(new Query())->select(['mid','title'])->from('menuitems')->where(['pmid'=>0]);
@@ -97,10 +102,9 @@ class Menu extends \yii\base\Model
 				$mlist[$v['mid']]=$v['title'];
 		}
 
-		
 		return $mlist;
 	}
-	// насйти меню .. для элемента  контента
+	// найти меню .. для элемента  контента
 	public static function findByContent($cid)
 	{
 		if (empty($cid))
@@ -111,15 +115,23 @@ class Menu extends \yii\base\Model
 			return new static();
 		return  new static($d);
 	}
-	// загржаем меню по идетификатору .
+	/**
+	 * проверка наличия алиаса в таблице меню
+	 * @param string $alias строка с алиасом 
+	 * @return boolean существование функта меню с таким же алиаслм..
+	 */
+	public static function alloasExists($alias)
+	{
+		return (new Query())->select('*')->from('menuitems')->where(['url'=>$alias])->exists();
+	}
+	
+	// загружаем меню по идетификатору .
 	public static function findById($mid)
 	{
-		$q=(new Query)->from('menuitems')->select('*')->where(['mid'=>$mid])->one();
+		$q=(new Query)->from('menuitems')->select('*')->where(['mid'=>$mid])->limit(1)->one();
 		if($q)
 			return new static($q);
-		
 		return new static ();
-
 	}
 
 	// узнать связанные элменты наследники 
@@ -127,7 +139,11 @@ class Menu extends \yii\base\Model
 	{
 		return $this->_children;
 	}
-	// вернуть ролителя .. 
+	/**
+	 * вернуть родителя .. 
+	 * @return int ключик элемента меню ..
+	 */
+	// 
 	public function getParent()
 	{
 		return $this->pmid=='root'?0:$this->pmid;
@@ -140,21 +156,33 @@ class Menu extends \yii\base\Model
 			$this->loadById($mid);
 		
 	}*/
-	// создание менюшки (пункта меню) 
+	/**
+	 * Создание/обновление пункта меню их формы контента.. 
+	 * @param array $post данные POST формы ..
+	 * @param int $cid Идентификатор сущности контента.. 
+	 * @return boolean Возвращаем результата выполнения операции true = успех 
+	 * */
+	 
 	public function updateContentItemFromPost($post,$cid)
 	{
 		$this->scenario=static::SCENARIO_CREATE_FROM_CONTENT;
-		if (!empty($cid) && $this->load($post) && $this->validate()){
-			$this->contentid=intval($cid);
-			$this->pmid=$this->pmid=='root'?0:intval($this->pmid);
-			// создаём новый пункт меню 
-			if (empty($this->mid) && !empty($this->title))
-				Yii::$app->db->createCommand()->insert('menuitems',$this->attributes)->execute();
+		if (empty($cid) || !$this->load($post) || !$this->validate()){
+			Yii::info('adadsda '.$cid,'app');
+			return false;
+		}
+		
+		$this->contentid=intval($cid);
+		$this->pmid=$this->pmid=='root'?0:intval($this->pmid);
+		// создаём новый пункт меню 
+		if (!$this->mid && $this->title){
+			$data=$this->getAttributes(null,['mid']);
+			Yii::$app->db->createCommand()->insert('menuitems',$data)->execute();
+			return true;
+		}
+
 			// обновление пункта меню .. 
-			if (!empty($this->mid)){
-				$m=Menu::findById($this->mid);// текущий элемент ..
-				
-				Yii::info([$m->attributes,$m->children,$m->parent,$m->scenario],'test');
+		if ($this->mid){
+			$m=Menu::findById($this->mid);// текущий элемент ..
 
 				$data=$this->attributes;
 				foreach($data as $x=>$y)
@@ -173,17 +201,24 @@ class Menu extends \yii\base\Model
 						Yii::$app->db->createCommand()->update('menuitems',['pmid'=>$m->parent],['mid'=>$m->children])->execute();
 				}
 			}
-			// надо поискать ункт меню в базе .. по cid 
+
 			Yii::trace($this->attributes,'menu values');
 			return true;
-		}
-		return false;
+		
 	}
-
+	/**
+	 * удаляем  пункт меню из формы контента ..
+	 * @param array $data POST данные формы 
+	 * @return boolean результат выполнения удаленияч 
+	 * */
 	public function killContentItem($data)
 	{
 		$this->scenario=static::SCENARIO_KILL_PUNKT;
-		if ($this->load($data) && $this->validate() && $this->mid){
+		if (!$this->mid || !$this->load($data) || !$this->validate())
+			return false;
+		$this->dropItem();
+		return true;
+			/*
 			// запросить данные о пункте меню ...
 			$m=(new \yii\db\Query())->select(['m0.pmid'])->from(['m0'=>'menuitems'])->where(['m0.mid'=>$this->mid]);
 			$d=$m->leftjoin(['m1'=>'menuitems'],'m1.pmid=m0.mid')->addSelect(['c'=>'group_concat(m1.mid)'])->limit(1)->one();
@@ -192,15 +227,15 @@ class Menu extends \yii\base\Model
 			// удалить пункт
 			Yii::$app->db->createCommand()->delete('menuitems',['mid'=>$this->mid])->execute();
 			Yii::$app->session->addFlash('info',sprintf('Элемент меню %d удалён',$this->mid));
+			*/
 
-			return true;
-		}
-		return false;
+		
+		
 
 		
 	}
 
-	// менюшка полностьбю для рендринга 
+	// менюшка полностью для рендринга 
 	public static function fullmenulist($status=null)
 	{
 		$q=(new Query())->from(['m'=>'menuitems'])->select('m.*')->orderBy(['m.pmid'=>SORT_ASC,'m.weight'=>SORT_ASC])->indexBy('mid');
@@ -230,37 +265,57 @@ class Menu extends \yii\base\Model
 	public function saveitem($data)
 	{
 		$this->scenario=static::SCENARIO_CREATE_FROM_MENU;
-		if ($this->load($data) && $this->validate() ){
-			$data=$this->attributes;
-			$mid=$data['mid'];
-			unset($data['mid']);
-			
-			if (empty($mid))// новый элемент . 
-				Yii::$app->db->createCommand()->insert('menuitems',$data)->execute();
-			else
-				Yii::$app->db->createCommand()->update('menuitems',$data,['mid'=>$mid])->execute();
-			Yii::$app->session->addFlash('info','Пункт меню сохранён');
-			return true;
-		}
+		if (!$this->load($data) || !$this->validate() )
+			return false;
 		
-		return false;
-	}
+		$data=$this->attributes;
+		$mid=$data['mid'];
+		unset($data['mid']);
+		
+		// транслитим пункт меню 
+		if (!$this->contentid){
+			$url=explode('/',trim($data['url']));
+			array_map([\URLify::class,'filter'], $url);
+			$data['url']=implode('/',$url);
+		}
+		else
+			$data['url']=null;
+		
+		$data['contentid']=$this->contentid?$data['contentid']:null;
+		
+		
 
+
+		if (empty($mid))// новый элемент . 
+			Yii::$app->db->createCommand()->insert('menuitems',$data)->execute();
+		else
+			Yii::$app->db->createCommand()->update('menuitems',$data,['mid'=>$mid])->execute();
+		Yii::$app->session->addFlash('info','Пункт меню сохранён');
+		return true;
+	
+		
+		
+	}
+	/**
+	 * удаление текущего пункта меню 
+	 * */
+	public function dropItem()
+	{
+		// обнвляем дочерним этементам родителя если есть ... 
+		if ($this->children)
+			Yii::$app->db->createCommand()->update('menuitems',['pmid'=>$this->parent],['mid'=>$this->children])->execute();
+		// удаляем элемент ...
+		Yii::$app->db->createCommand()->delete('menuitems',['mid'=>$this->mid])->execute();
+		Yii::$app->session->addFlash('info','Пункт меню удалён');
+
+	}
 	// удаление элемента меню ...
 	public function killitem($data)
 	{
-		if ($this->load($data) && $this->validate()){
-			
-			// обнвляем дочерним этементам родителя если есть ... 
-			if ($this->children)
-				Yii::$app->db->createCommand()->update('menuitems',['pmid'=>$this->parent],['mid'=>$this->children])->execute();
-			// удаляем элемент ...
-			Yii::$app->db->createCommand()->delete('menuitems',['mid'=>$this->mid])->execute();
-			Yii::$app->session->addFlash('info','Элемент удалён');
-			return true;
-		}
-		return false;
-		
+		if (!$this->load($data) || !$this->validate())
+			return false;
+		$this->dropItem();	
+		return true;
 	}
 }
 ?>

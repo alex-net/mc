@@ -30,6 +30,7 @@ class UrlmanagerInit implements \yii\base\BootstrapInterface
 			// работа с картинками 
 			'files/<preset>/<fn>'=>'image/file',
 			'files/kill'=>'image/file-kill',
+			'files/up'=>'image/file-upload',// загрузка файлов ...
 			'set-files-weight'=>'image/set-files-weight',
 			
 			// редактирование пункта менб 

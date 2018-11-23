@@ -24,7 +24,14 @@
   padding: 0; }
   .list-files-widget li {
     display: inline-block;
-    position: relative; }
+    position: relative;
+    margin: 0.5em;
+    width: 135px;
+    height: 130px;
+    border: 1px solid transparent;
+    border-radius: 0.5em; }
+    .list-files-widget li:hover {
+      border-color: black; }
     .list-files-widget li img {
       display: block;
       margin: 0 auto; }
@@ -39,7 +46,8 @@
       height: 1em;
       line-height: 1em;
       text-align: center;
-      display: none; }
+      display: none;
+      border-radius: 0.5em; }
       .list-files-widget li .kill::before {
         content: 'X'; }
     .list-files-widget li:hover .kill {

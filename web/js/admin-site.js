@@ -1,10 +1,24 @@
 $(function (){
 	// сраница редактирования  контента ..
-	
+	// делаем на сранице аккордионы ..
 	$('.content-creator-form').find('.field-content-teaser, .alias-settings, .add-menu, .file-settings').accordion({
 		collapsible:true,
 		active:false,
 	});
+
+	// жмём на функциональную кнопку . в фарме .. 
+	$('form.content-creator-form .footer button').on('click',function(e){
+		if (this.name=='kill' && !confirm('Действительно удалить?'))
+			e.preventDefault();
+		//  надо обновить элементы .
+		if (window.CKEDITOR && this.name=='save'){
+			for (var k in CKEDITOR.instances)
+				CKEDITOR.instances[k].updateElement();
+			
+		}
+
+	});
+
 
 	// страница меню. //
 	$('.sorter-eleemnts-menu').sortable({
@@ -109,45 +123,12 @@ $(function (){
 	});
 
 
-	// удаление картинки ...из писка .. 
-	$('.list-files-widget li .kill').on('click',function (){
-		var fn=$(this).parent().data('fn')
-		var el=$(this).parent();
-		$.post('/files/kill',{fn:fn},function(data){
-			if (data.status=='ok')
-				el.remove();
-			
-		});
-	});
 
 
-	$('.list-files-widget').sortable({
-		items:'> li',
-		opacity:0.8,
-		grid:[1,1],
-		stop:function(e,ui){
-			console.log($(this));
-			// собрать порядок  файлов .. 
-			var files=[];
-			$(this).find('li').each(function(){
-				files.push($(this).data('fn'));
-			});
-
-			$.post('/set-files-weight',{fl:files},function(d){
-				console.log(d);
-			});
-
-		},
-	});
-
+	// применяем ckeditor для всех textareas
 	if (window.CKEDITOR)
 		CKEDITOR.replaceAll();
 	
-
-	$('form.content-creator-form .footer button').on('click',function(e){
-		if (this.name=='kill' && !confirm('Действительно удалить?'))
-			e.preventDefault();
-	});
 
 	//	nicEditors.allTextAreas();
 

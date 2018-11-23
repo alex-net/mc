@@ -47,8 +47,36 @@ class ContentController extends Controller
 	// Редактироание старного ...
 	public function actionCtEdit($type,$id=0)
 	{
-		$post=Yii::$app->request->post();
-		if ($post){ // данные пришли из формы ..
+		// загрузка ...
+		$c=Content::findById($id);
+		if(!$c)// не получилось загрузить 
+			$c=new Content(['type'=>$type]);
+
+		// отправка формы ..
+		if (Yii::$app->request->isPost){
+			$post=Yii::$app->request->post();
+			switch(true){
+				case isset($post['save']):
+					$res=$c->save($post);
+					break;
+				case isset($post['kill']):
+					$res=$c->kill($post);
+					break;
+			}
+			if ($res)// если всё прошло успешно .. редиректим на список 
+				return $this->redirect(['ct-list','type'=>$type]);
+		}
+
+		return $this->render('ct-edit',[
+			'type'=>$type,
+			'id'=>$id,
+			'model'=>$c,
+			//'menu'=>$m,
+			//'files'=>$f,
+		]);
+
+		if (Yii::$app->request->isPost){ // данные пришли из формы ..
+			$post=Yii::$app->request->post();
 			$c=new Content(['type'=>$type]);
 			$m=new Menu();
 			$f=new FilesModel(['ct'=>$type]);

@@ -22,6 +22,9 @@ class m180520_095118_content_tables extends Migration
             'body'=>$this->text()->comment('Содержимое'),
             'teaser'=>$this->text()->comment('Содержимое'),
             'created'=>$this->integer()->comment('Создан'),
+            /**
+             * @todo  nomenuitem можно бахнуь из базы
+             * */
             'nomenuitem'=>$this->boolean()->defaultValue(false)->comment('Без пункта меню'),
         ]);
         echo "Таблица контента создана \n";
@@ -31,6 +34,7 @@ class m180520_095118_content_tables extends Migration
             'weight'=>$this->integer(10)->notnull()->defaultValue(0)->comment('Вес файла'),
             'cid'=>$this->integer()->notnull()->comment('ссылка на контент'),
             'ct'=>$this->string(10)->notnull()->comment('Тип контента (он же путь к папке с файлами'),
+            'uid'=>$this->integer()->notnull()->comment('Ссылка на юзера загрузившего файл'),
         ]);
         $this->createIndex('cidpfiles','files',['cid']);
         try{

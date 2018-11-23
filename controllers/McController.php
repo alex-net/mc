@@ -18,7 +18,7 @@ class McController extends Controller
 	{
 		return $this->render('test');
 	}
-	// отоьражение контента на сайте .. 
+	// отображение контента на сайте .. 
 	public function actionShowContent($path='')
 	{
 		Yii::$app->params['isfront']=empty($path);

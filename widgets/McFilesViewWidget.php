@@ -4,7 +4,9 @@ namespace app\widgets;
 
 use app\models\FilesModel;
 use Yii;
-
+/**
+ * класс позволяет загрузить файлы в контент ...
+ */
 class McFilesViewWidget extends \yii\base\Widget
 {
 	public $ct;// тип контента .. 
@@ -14,12 +16,20 @@ class McFilesViewWidget extends \yii\base\Widget
 	{
 		$flist=FilesModel::findFilesPerCid($this->cid);
 		
-		$fl=[];
-		foreach($flist as $y)
-			$fl[]=$y['filename'];
 		
-		$this->view->registerJsVar('filesuploadedlist',$fl);
-		$this->view->registerJsVar('filesloadurl',Yii::$aliases['@filesUrl']);
+		$this->view->registerJsVar('fileman',[
+			'filesuploadedlist'=>$flist,
+			'filesloadurl'=>Yii::$aliases['@filesUrl'],
+			'filesexts'=>FilesModel::IMG_EXT,
+			'contentnum'=>(int)$this->cid,
+			'smallpreset'=>$this->preset,
+
+		]);
+		//$this->view->registerJsVar('filesuploadedlist',$fl);
+		//$this->view->registerJsVar('filesloadurl',Yii::$aliases['@filesUrl']);
+		//$this->view->registerJsVar('filesexts',FilesModel::IMG_EXT);
+		//$this->view->registerJsVar();
+		//$this->view->registerJsVar('contenttype',$this->ct);
 		return $this->render('files-list',[
 			'list'=>$flist,
 			'preset'=>$this->preset,

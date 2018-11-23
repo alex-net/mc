@@ -54,4 +54,5 @@ return [
             'crop'=>true, 
         ],
     ],
+    'CkDefPpreset'=>'content',
 ];

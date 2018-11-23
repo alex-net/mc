@@ -8,6 +8,7 @@ class ImageController extends \yii\web\Controller
 	public function beforeAction($action)
 	{
 		$res=parent::beforeAction($action);
+
 		if ((!$res || Yii::$app->user->isGuest ||  !Yii::$app->user->identity->can('image manager') ) && in_array($action, ['file-kill','set-files-weight']))
 			$this->redirect(['admin/user/index']);
 			//throw new \yii\web\HttpException(403,"недостаточно прав");
@@ -48,8 +49,6 @@ class ImageController extends \yii\web\Controller
 			$im=$img->thumbnail(new \Imagine\Image\Box($w,$h),$mode); /// THUMBNAIL_INSET
 			$im->save($dest);
 
-			
-
 			//print_r($ps);
 		}
 		header('Content-Type:image/'.explode('.',$fn)[1].';');
@@ -68,16 +67,21 @@ class ImageController extends \yii\web\Controller
 		if (!Yii::$app->request->isAjax || !Yii::$app->request->isPost)
 			throw new yii\web\HttpException(400,"Некорректный запрос");
 		$post=Yii::$app->request->post();
-		Yii::$app->response->format=yii\web\Response::FORMAT_JSON;
 		$f=FilesModel::loadFile($post['fn']);
-		if ($f)
+		Yii::$app->response->format=\yii\web\Response::FORMAT_JSON;
+		if ($f){
+			// собтвенно удаление... 
 			$f->kill();
-		// собтвенно удаление... 
+			
+			$flist=FilesModel::findFilesPerCid($f->cid);
+			return [
+				'list'=>$flist,
+				'status'=>'ok',
+			];	
+		}
 		
-		return [
-			'status'=>'ok',
-			'fn'=>$post['fn'],
-		];	
+		return ['status'=>'err'];
+		
 	}
 
 	// загнать вес файлов ... по их порядку в массиве 
@@ -94,9 +98,37 @@ class ImageController extends \yii\web\Controller
 			return ['ok'=>1];
 
 		return ['err'=>1];
-		Yii::info($post['fl'],'fl');
 
 		///if ($post['act']=='set-files-weight' && !empty() )
 
+	}
+
+	/**
+	 * аяксовая загрузка файлов ... 
+	 * 
+	 */
+	public function actionFileUpload()
+	{
+		
+		$post=Yii::$app->request->post();
+		
+		// создаём объект можели 
+		$fm=new FilesModel([
+			'ct'=>$post['ctype'],
+			'cid'=>$post['cidis'],
+			'uid'=>Yii::$app->user->id,
+		]);
+		// грузим файлы .. 
+		$fm->files=\yii\web\UploadedFile::getInstancesByName(\yii\helpers\Html::getInputName($fm,'files'));
+
+		// сохраняем 
+		$res=$fm->save();
+
+		Yii::$app->response->format=\yii\web\Response::FORMAT_JSON;
+		$flist=FilesModel::findFilesPerCid($fm->cid);
+		return [
+			'list'=>$flist,
+			'status'=>'ok',
+		];
 	}
 }

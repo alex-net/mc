@@ -27,7 +27,11 @@ class CKEditorAsset extends \yii\web\AssetBundle
 				$crop=empty($y['crop'])?'':' (с обрезкой)';
 				$presets[]=[$y['size'].$crop,$x];
 			}
-		Yii::$app->view->registerJsVar('imagepresets',$presets);
+		Yii::$app->view->registerJsVar('ck',[
+			'imagepresets'=>$presets,
+			'defpreset'=>Yii::$app->params['CkDefPpreset'],
+		]);
+		
 		
 		
 		

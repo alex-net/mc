@@ -8,6 +8,8 @@ use yii\db\Query;
 
 class FilesModel extends \yii\base\Model
 {
+	// допусимые зазрегения файлов ..
+	
 	const IMG_EXT=['png','jpg','jpeg'];
 	// число картинок ..  0 = неограниченно
 	const ContentTypesFileCount=['page'=>1,'new'=>1,'album'=>0];
@@ -19,6 +21,7 @@ class FilesModel extends \yii\base\Model
 	public $filename;// имя коечного файла... 
 	public $cid;
 	public $weight; // вес файла в списке ...
+	public $uid;// номер учётки юзера ..
 
 
 	public function attributeLabels()
@@ -31,37 +34,51 @@ class FilesModel extends \yii\base\Model
 	public function rules()
 	{
 		return [
-			['files','yii\validators\ImageValidator','extensions'=>self::IMG_EXT,'maxFiles'=>self::ContentTypesFileCount[$this->ct]],
+			['files','image','extensions'=>self::IMG_EXT,'skipOnEmpty'=>false,'maxFiles'=>20],
+			[['ct','cid','uid'],'required'],
+			[['cid','uid'],'integer'],
 		];
 	}
 
-
-	public function save($data,$cid)
+	/**
+	 * сохранение файлов в базу . 
+	 */
+	public function save()
 	{
-		if ($this->load($data) && $this->validate()){
-			// пробуем залить файл ..
-			Yii::info($_FILES,'FILES1');
-			if ($this->ct=='album')
-				$fil=\yii\web\UploadedFile::getInstances($this,'files');
-			else
-				$fil=[\yii\web\UploadedFile::getInstance($this,'files')];
-			$path=Yii::$aliases['@files'].'/'.$this->ct;
-			if (!file_exists($path))
-				FileHelper::createDirectory($path);
-			foreach($fil as $k=>$f)
-				if ($f){
-					/// сохраняем файл ..
-					$fn=$cid.'-'.time().'-'.$k.'.'.$f->extension;
-					if ($f->saveAs($path.'/'.$fn))// записываем файлик в базу ..
-						Yii::$app->db->createCommand()->insert('files',['cid'=>$cid,'ct'=>$this->ct,'filename'=>$fn])->execute();
-				}
+		
+		if (!$this->validate())
+			return false;
+		
+		// id текущего пользователя .. 
+		$uid=Yii::$app->user->id;
+		// каталог загрузки контента ...
+		$path=Yii::$aliases['@files'].'/'.$this->ct;
 
-			Yii::$app->session->addFlash('info','Фал был загружен');
-			return true;
-		}
-		return false;
+		if (!file_exists($path))
+			FileHelper::createDirectory($path);
+		
+		
+		$t=time();
+		foreach($this->files as $k=>$f)
+			if ($f){
+				/// сохраняем файл ..
+				$fn=$uid.'-'.$t.'-'.$k.'.'.$f->extension;
+				if ($f->saveAs($path.'/'.$fn))// записываем файлик в базу ..
+					Yii::$app->db->createCommand()->insert('files',[
+						'cid'=>$this->cid,
+						'ct'=>$this->ct,
+						'filename'=>$fn,
+						'uid'=>$uid
+					])->execute();
+			}
+
+		Yii::$app->session->addFlash('info','Файл был загружен');
+		return true;
+		
 	}
-	// удаление одного файла .. 
+	/**
+	 * удаление текущего элемента (файла) .. 
+	 */
 	public function kill()
 	{
 		$path=Yii::$aliases['@files'].'/'.$this->ct.'/'.$this->filename;
@@ -74,10 +91,13 @@ class FilesModel extends \yii\base\Model
 
 	/**
 	* получить список файлов для заданного контента ..
+	* @param int $cid  идентификатор сущности контента
+	* 
 	*/
 	public static function findFilesPerCid($cid)
 	{
 		$q=(new Query())->select(['ct','filename'])->from('files')->where(['cid'=>$cid])->orderBy(['weight'=>SORT_ASC])->all();
+		Yii::info($q,'files uploaded');
 		$path=Yii::$aliases['@filesUrl'];
 		foreach($q as $x=>$y){
 			$q[$x]['url']=$path.'/'.$y['ct'].'/'.$y['filename'];
@@ -142,6 +162,19 @@ class FilesModel extends \yii\base\Model
 		foreach(array_values($fl) as $x=>$y)
 			Yii::$app->db->createCommand()->update('files',['weight'=>$x],['filename'=>$y])->execute();
 		return true;
+
+	}
+
+
+	/**
+	 * обнвить cid для файлов  (вновь созданный контент .) 
+	 * @param integer $cid номр только что дабавленной сущности
+	 *
+	 * @return void
+	 */
+	public function updateCid($cid)
+	{
+		Yii::$app->db->createCommand()->update('files',['cid'=>$cid],['uid'=>Yii::$app->user->id,'cid'=>0])->execute();
 
 	}
 }

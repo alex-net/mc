@@ -4,6 +4,7 @@ use yii\widgets\ActiveForm;
 use app\widgets\McFilesViewWidget;
 
 \app\assets\CKEditorAsset::register($this);
+
 $titles=[
 	'page'=>$id?'Редактирование текстовой страницы':'Новая текстовая страница',
 	'new'=>$id?'Редактирование новости':'Новая новость',
@@ -30,33 +31,32 @@ $titles=[
 <div class="alias-settings">
 	<label>Настройки алиаса (текущий: <?=$model->alias;?>)</label>
 	<div >
-<?=$f->field($model,'aliasisuser')->checkbox(); ?>
-<?=$f->field($model,'alias');?>
-</div>
+		<?=$f->field($model,'aliasisuser')->checkbox(); ?>
+		<?=$f->field($model,'alias');?>
+	</div>
 </div>
 <div class="file-settings">
 	<label>Загрузить файл(ы)</label>
 	<div>
-		<?php if ($model->type=='album'):?>
-			<?=$f->field($files,'files[]')->fileinput(['multiple'=>'multiple']);?>
-		<?php else:?>
-			<?=$f->field($files,'files')->fileinput();?>
-			
-		<?php endif;?>
-		<?=McFilesViewWidget::widget(['cid'=>$model->cid,'preset'=>'thumb']);?>
+		
+		<?php //=$f->field($files,'files[]')->fileinput(['multiple'=>'multiple']);?>
+
+		<?=McFilesViewWidget::widget(['cid'=>$model->cid,'preset'=>'thumb','ct'=>$model->type]);?>
 	</div>
 	
 </div>
 
+
 <div class="add-menu">
-	<label>Добавить пункт меню (<?=$menu->title?$menu->title:'без пункта меню'?>)</label>
+	<label>Добавить пункт меню (<?=$model->menu->title?$model->menu->title:'без пункта меню'?>)</label>
 	<div>
 		<?=$f->field($model,'nomenuitem')->checkbox();?>
-		<?=$f->field($menu,'title');?>
-		<?=$f->field($menu,'mid',['template'=>'{input}'])->hiddenInput();?>
-		<?=$f->field($menu,'pmid')->dropDownList($menu->generatemMenuOptions());?>
+		<?=$f->field($model->menu,'title');?>
+		<?=$f->field($model->menu,'mid',['template'=>'{input}'])->hiddenInput();?>
+		<?=$f->field($model->menu,'pmid')->dropDownList($model->menu->generatemMenuOptions());?>
 	</div>
 </div>
+
 
 <div class="footer">
 	<?=Html::submitButton('Сохранить',['class'=>'btn btn-success','name'=>'save']);?>
