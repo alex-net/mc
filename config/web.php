@@ -53,6 +53,12 @@ $config = [
         'db' => $db,
         'assetManager'=>[
             'linkAssets'=>true,
+            'bundles'=>[
+                'yii\web\JqueryAsset'=>[
+                    'sourcePath'=>null,
+                    'js'=>['//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'],
+                ],
+            ],
         ],
         'session'=>[
             'class'=>'yii\web\DbSession',
@@ -77,7 +83,7 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['127.0.0.1','109.191.216.143', '::1'],
+        'allowedIPs' => ['127.0.0.1','109.191.205.45', '::1'],
     ];
 /*
     $config['bootstrap'][] = 'gii';

@@ -226,3 +226,12 @@ html,body {padding:0;margin:0;height:100%;}
 	}
 	button {color:white;background-color:#0097d1;border:#0077b1;display:block;width:100%;padding:0.5em;box-sizing:border-box;}
 }
+
+// кнопка версии сайта для соабовидящих ...
+.bvi-panel-wrapp {
+	text-align: center;
+	.bvi-panel-open {
+		&::before {padding-right:5px;}
+		background:red;color:white;font-weight: bold;padding:0.5em;border-radius:0.5em;text-decoration: none;
+	}	
+}

@@ -2,6 +2,7 @@
 use \yii\helpers\Html;
 use app\assets\AppAsset;
 use app\models\Menu;
+
 AppAsset::register($this);
 $this->beginPage();
 ?>
@@ -9,6 +10,7 @@ $this->beginPage();
 <html>
 	<head>
 		<meta charset="<?= Yii::$app->charset ?>">	
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<title><?= Html::encode($this->title) ?></title>
 		<?php $this->head();?>
 	</head>
@@ -81,6 +83,7 @@ $this->beginPage();
 				<div class='sitebar'>
 					<?=\app\widgets\BlocksView::widget();?>
 					<?php //\app\widgets\NewsWidget::widget(['ctype'=>'new']);?>
+					<?=\app\widgets\BviWidget::widget();?>
 				</div>
 				<div class="content">
 					<?php if (!empty(Yii::$app->params['isfront'])):?>

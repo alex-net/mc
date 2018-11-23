@@ -416,4 +416,16 @@ html, body {
   padding: 0.5em;
   box-sizing: border-box; }
 
+.bvi-panel-wrapp {
+  text-align: center; }
+  .bvi-panel-wrapp .bvi-panel-open {
+    background: red;
+    color: white;
+    font-weight: bold;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    text-decoration: none; }
+    .bvi-panel-wrapp .bvi-panel-open::before {
+      padding-right: 5px; }
+
 /*# sourceMappingURL=style.css.map */
