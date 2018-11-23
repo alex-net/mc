@@ -7,7 +7,7 @@ class EventsNewsWidget extends \yii\base\Widget
 	public $count; // количестово эдементов .. 
 	public function run()
 	{
-		$els=Content::NewsListLast(2);
+		$els=Content::NewsListLast($this->count);
 		//подгружаем картинки ... 
 		$files=\app\models\FilesModel::filespercontentids(array_keys($els));
 		foreach($files as $x=>$y)

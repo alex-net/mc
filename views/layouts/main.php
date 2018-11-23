@@ -84,7 +84,7 @@ $this->beginPage();
 				</div>
 				<div class="content">
 					<?php if (!empty(Yii::$app->params['isfront'])):?>
-						<?=\app\widgets\EventsNewsWidget::widget(['count'=>5]);?>
+						<?=\app\widgets\EventsNewsWidget::widget(['count'=>4]);?>
 					<?php endif;?>
 					
 					
