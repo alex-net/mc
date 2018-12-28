@@ -38,3 +38,5 @@ tests/_support/_generated
 /presets
 .sass-cache
 web/bvi
+*.sql
+*.tbz
